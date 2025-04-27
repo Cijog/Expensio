@@ -10,6 +10,7 @@ import Signup from "./pages/SignUp"
 import Trips from "./pages/Trips"
 import Receipts from "./pages/Receipts"
 import Settings from "./pages/Settings"
+import CollaborationRequestsPage from "./pages/CollaborationRequests"
 import axios from "axios"
 
 function App() {
@@ -83,6 +84,7 @@ function App() {
           <Route path="/" element={<Home user={user} />} />
           <Route path="/expenses" element={<Expenses user={user} />} />
           <Route path="/trips" element={<Trips user={user} />} />
+          <Route path="/collaboration-requests" element={<CollaborationRequestsPage user={user} />} />
           <Route path="/receipts" element={<Receipts user={user} />} />
           <Route path="/settings" element={<Settings user={user}  />} />
           {/* Add other protected routes here */}

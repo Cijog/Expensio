@@ -441,10 +441,11 @@ function Trips({ user }) {
     }
 
     // Make sure we're using the trip ID as a string for lookup
-    const tripId = trip._id.toString()
+    const tripId = String(trip._id)
     const expenses = allExpenses[tripId] || []
 
     console.log(`Calculating progress for trip ${tripId}:`, {
+      allExpensesKeys: Object.keys(allExpenses),
       hasExpenses: expenses.length > 0,
       budget: trip.budget,
       expenses: expenses,
@@ -460,8 +461,6 @@ function Trips({ user }) {
     const budget = typeof trip.budget === "number" ? trip.budget : 0
     const percentage = budget > 0 ? (totalExpenses / budget) * 100 : 0
     const remaining = Math.max(budget - totalExpenses, 0)
-
-    
 
     return {
       totalSpent: totalExpenses,
@@ -573,6 +572,15 @@ function Trips({ user }) {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={() => navigate("/collaboration-requests")}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-lg"
+            title="Collaboration Requests"
+          >
+            <Users className="h-5 w-5 mr-2" /> Collaboration Requests
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => navigate("/")}
             className="bg-gradient-to-r from-red-600 to-red-800 text-white px-4 py-2 rounded-lg hover:from-red-700 hover:to-red-900 transition-colors flex items-center shadow-lg"
           >
@@ -581,6 +589,7 @@ function Trips({ user }) {
         </div>
       </div>
 
+      {console.log("Rendering trips with allExpenses keys:", Object.keys(allExpenses))}
       {trips.length === 0 ? (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -605,6 +614,7 @@ function Trips({ user }) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {trips.map((trip) => {
+            console.log("Rendering trip:", trip._id, "Has expenses key:", Object.prototype.hasOwnProperty.call(allExpenses, trip._id));
             const { status, color } = getTripStatus(trip);
             const { totalSpent, percentage, remaining } = calculateTripProgress(trip);
             const tripOwner = isOwner(trip);
@@ -622,11 +632,11 @@ function Trips({ user }) {
                   <h2 className="text-xl text-white font-medium">{trip.destination}</h2>
                   <div className="flex items-center space-x-2">
                     <span className={`text-xs px-2 py-1 rounded-full ${color} text-white font-medium`}>{status}</span>
-                    {!tripOwner && (
-                      <span className="text-xs px-2 py-1 rounded-full bg-purple-500 text-white font-medium">
-                        Collaborative
-                      </span>
-                    )}
+                  {!tripOwner && (
+                    <span className="text-xs px-2 py-1 rounded-full bg-purple-600 text-white font-semibold">
+                      Collaborative
+                    </span>
+                  )}
                   </div>
                 </div>
 
@@ -653,7 +663,7 @@ function Trips({ user }) {
                   )}
                 </div>
 
-                <div className="mb-4">
+                {/* <div className="mb-4">
                   <div className="flex justify-between items-center mb-1">
                     <p className="text-gray-400 text-sm">Budget Usage:</p>
                     <p className="text-white text-sm font-medium">{percentage.toFixed(1)}%</p>
@@ -674,7 +684,7 @@ function Trips({ user }) {
                       Left: <span className="text-white">€{remaining.toFixed(2)}</span>
                     </span>
                   </div>
-                </div>
+                </div> */}
 
                 {percentage > 90 && (
                   <div className="flex items-center text-red-500 text-sm mb-4 bg-red-900/20 p-2 rounded-md">
@@ -935,15 +945,17 @@ function Trips({ user }) {
                             <span
                               className={`${
                                 collaborator.status === "accepted"
-                                  ? "text-green-400"
+                                  ? "text-green-400 font-semibold"
                                   : collaborator.status === "declined"
-                                    ? "text-red-400"
-                                    : "text-yellow-400"
+                                    ? "text-red-400 font-semibold"
+                                    : "text-yellow-400 font-semibold"
                               }`}
                             >
                               {collaborator.status.charAt(0).toUpperCase() + collaborator.status.slice(1)}
                             </span>
-                            {collaborator.hasPaid && <span className="text-green-400">Paid</span>}
+                            {collaborator.hasPaid && (
+                              <span className="text-green-400 font-semibold ml-2">Paid</span>
+                            )}
                           </div>
                         </div>
                         <motion.button

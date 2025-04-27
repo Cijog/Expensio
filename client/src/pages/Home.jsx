@@ -18,6 +18,7 @@ import {
 import { Bar } from "react-chartjs-2"
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js"
 import { motion } from "framer-motion"
+import MonthlyExpenseAnalyzer from "../components/MonthlyExpenseAnalyzer"
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
@@ -31,6 +32,7 @@ function Home({ user }) {
   const [error, setError] = useState(null)
   const [dataError, setDataError] = useState(null)
   const [success, setSuccess] = useState(false)
+  const [monthlyBudget, setMonthlyBudget] = useState(40000) // Default monthly budget
   const navigate = useNavigate()
 
   // Form visibility states
@@ -73,7 +75,24 @@ function Home({ user }) {
     }
 
     fetchData()
+    fetchUserBudget()
   }, [user, navigate])
+
+  const fetchUserBudget = async () => {
+    try {
+      // Try to fetch user's monthly budget from the server
+      const response = await axios.get("http://localhost:5000/users/budget", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
+
+      if (response.data && response.data.monthlyBudget) {
+        setMonthlyBudget(response.data.monthlyBudget)
+      }
+    } catch (err) {
+      console.error("Error fetching user budget:", err)
+      // Keep using the default budget if there's an error
+    }
+  }
 
   const fetchData = async () => {
     try {
@@ -450,6 +469,9 @@ function Home({ user }) {
         </motion.button>
       </div>
 
+      {/* Monthly Expense Analyzer */}
+      <MonthlyExpenseAnalyzer monthlyBudget={monthlyBudget} />
+
       {/* Monthly Expenses Graph */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -608,6 +630,8 @@ function Home({ user }) {
               >
                 <option value="">Select a category</option>
                 <option value="Food">Food</option>
+                <option value="Coffee">Coffee</option>
+                <option value="Shopping">Shopping</option>
                 <option value="Transportation">Transportation</option>
                 <option value="Accommodation">Accommodation</option>
                 <option value="Entertainment">Entertainment</option>
@@ -708,6 +732,8 @@ function Home({ user }) {
               >
                 <option value="">Select a category</option>
                 <option value="Food">Food</option>
+                <option value="Coffee">Coffee</option>
+                <option value="Shopping">Shopping</option>
                 <option value="Transportation">Transportation</option>
                 <option value="Accommodation">Accommodation</option>
                 <option value="Entertainment">Entertainment</option>
